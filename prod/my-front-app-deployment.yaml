@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-front-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-front-app
+  template:
+    metadata:
+      labels:
+        app: my-front-app
+    spec:
+      #imagePullSecrets:
+      #- name: dockerhub-secret
+      containers:
+      - name: my-front-app-container
+        image: khaoulaout/my-front-app:jma-5.0
+        ports:
+        - containerPort: 80
+
+

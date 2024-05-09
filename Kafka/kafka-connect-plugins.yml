@@ -1,0 +1,601 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: my-connect
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  replicas: 3
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        name: connect-metrics
+        key: metrics-config.yml
+  config:
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+  build:
+    output:
+      type: docker
+      image: ttl.sh/strimzi-connect-example-3.7.0:24h
+    plugins:
+      - name: idcrqv1006
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/connectors/IdcRQV1006.zip?inline=false
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv1006/IdcRQV1006/files/services_config/IdcRQV1006.zip
+
+      - name: idcrqv10042
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10042/IdcRQV10042/files/connectors/IdcRQV10042.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10042/IdcRQV10042/files/services_config/IdcRQV10042.zip
+
+      - name: idcrqv10043
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10043/IdcRQV10043/files/connectors/IdcRQV10043.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10043/IdcRQV10043/files/services_config/IdcRQV10043.zip
+            
+      - name: idcrqv10044
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10044/IdcRQV10044/files/connectors/IdcRQV10044.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10044/IdcRQV10044/files/services_config/IdcRQV10044.zip
+            
+      - name: idcrqv2003
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2003/IdcRQV2003/files/connectors/IdcRQV2003.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2003/IdcRQV2003/files/services_config/IdcRQV2003.zip
+            
+      - name: idcrqv2004
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2004/IdcRQV2004/files/connectors/IdcRQV2004.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2004/IdcRQV2004/files/services_config/IdcRQV2004.zip
+            
+      - name: idcrqv2005
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2005/IdcRQV2005/files/connectors/IdcRQV2005.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv2005/IdcRQV2005/files/services_config/IdcRQV2005.zip
+            
+      - name: idcrqv3004
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rvq3004/IdcRQV3004/files/connectors/IdcRQV3004.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rvq3004/IdcRQV3004/files/services_config/IdcRQV3004.zip
+            
+      - name: idcrqv10041
+        artifacts:
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10041/IdcRQV10041/files/connectors/IdcRQV10041.zip
+          - type: zip
+            url: http://192.168.1.48/devops-kafka/connectors/-/raw/main/rqv10041/IdcRQV10041/files/services_config/IdcRQV10041.zip      
+            
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv1006
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV1006"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV1006
+        producer.bootstrap.server: 192.168.1.64:32208
+        http.soap.template.root: /opt/kafka/plugins/idcrqv1006/a8acb768/  
+        topics: Display-line-Balance-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV1006
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.26:8080/
+        producer.target.topic: Display-line-Balance-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: QueryCustomerInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV1006
+        login.system.password: RQV1006
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+        
+---
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv10042
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV10042"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV10042
+        producer.bootstrap.server: 192.168.1.64:32208
+        http.soap.template.root: /opt/kafka/plugins/idcrqv10042/61834f1e/  
+        topics: PASS-Susbsciption-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV10042
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.25:8080/
+        producer.target.topic: PASS-Susbsciption-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: ChangeSubOffering
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV10042
+        login.system.password: RQV10042
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+
+        
+---
+
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv10043
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV10043"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV10043
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv10043/31e355bd/  
+        topics: CustomerLevelRequest
+        tasks.max: 3
+        http.soap.name: IdcRQV10043
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.25:8080/
+        producer.target.topic: CustomerLevelResponse
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: ChangeSubInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV10043
+        login.system.password: RQV10043
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+
+        
+        
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv10044
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV10044"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV10044
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv10044/c74ff383/  
+        topics: RQV10044-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV10044
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.25:8080/
+        producer.target.topic: RQV10044-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: ChangeSubInfo
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV10044
+        login.system.password: RQV10044
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+       
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv2003
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV2003"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV2003
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv2003/836b82b3/  
+        topics: RQV2003-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV2003
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.29:8080/
+        producer.target.topic: RQV2003-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: http://www.inwi.ma/soa/cvm/CVMServices/earnLoyaltyPoints
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV2003
+        login.system.password: RQV2003
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+    
+   
+   
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv2004
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV2004"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV2004
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv2004/4f302d68/  
+        topics: RQV2004-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV2004
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.29:8080/
+        producer.target.topic: RQV2004-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: SyncAPIRequest
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: khalid
+        login.system.password: RQV10042
+        http.ssl.enabled: true
+        http.ssl.certificate.password: changeit
+        http.ssl.certificate: /usr/lib/jvm/jdk-11-oracle-x64/lib/security/cacerts
+        http.ssl.verify: false
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv2005
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV2005"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV2005
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv2005/28313b57/  
+        topics: RQV2005-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV2005
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.29:8080/
+        producer.target.topic: RQV2005-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: ChangeSubValidity
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV2005
+        login.system.password: RQV2005
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv3004
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV3004"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV3004
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv3004/d17b3d85/  
+        topics: RQV3004-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV3004
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.25:8080/
+        producer.target.topic: RQV3004-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: http://sicap.com/wana/lm/plugins/ws/points/offerOrderCreate
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: khalid
+        login.system.password: RQV3004  
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0           
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: idcrqv10041
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: "io.indatacore.kafka.connect.http.IdcRQV10041"
+  tasksMax: 3
+  config:
+        connector.class: io.indatacore.kafka.connect.http.IdcRQV10041
+        producer.bootstrap.server: 192.168.1.64:32208
+
+        http.soap.template.root: /opt/kafka/plugins/idcrqv10041/811f748f/  
+        topics: balance-adjustment-producer-topic
+        tasks.max: 3
+        http.soap.name: IdcRQV10041
+        http.headers.content.type: text/xml; charset=utf-8
+        http.url: http://192.168.1.25:8080/
+        producer.target.topic: balance-adjustment-consumer-topic
+        producer.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        http.api.type: SOAP
+        key.converter.schemas.enable: false
+        producer.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.converter.schemas.enable: false
+        errors.tolerance: all
+        value.converter: org.apache.kafka.connect.storage.StringConverter
+        key.converter: org.apache.kafka.connect.storage.StringConverter
+        http.action: Adjustment
+        schemas.enable: false
+        producer.sasl.enabled: true
+        producer.sasl.username: admin
+        producer.sasl.password: OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I
+        connector.client.config.override.policy: All
+        login.system.code: RQV10041
+        login.system.password: RQV10041
+        system.token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjb25uZWN0b3IiLCJleHAiOjE3MTU2ODY4MzMsImlhdCI6MTcwNzkxMDgzM30.kh9YaLPE0G-9L7uL-a0xT9jvhj-vWrY0Bew9qQc7Yt0
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: connect-metrics
+  labels:
+    app: strimzi
+data:
+  metrics-config.yml: |
+    # Inspired by kafka-connect rules
+    # https://github.com/prometheus/jmx_exporter/blob/master/example_configs/kafka-connect.yml
+    # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    rules:
+    #kafka.connect:type=app-info,client-id="{clientid}"
+    #kafka.consumer:type=app-info,client-id="{clientid}"
+    #kafka.producer:type=app-info,client-id="{clientid}"
+    - pattern: 'kafka.(.+)<type=app-info, client-id=(.+)><>start-time-ms'
+      name: kafka_$1_start_time_seconds
+      labels:
+        clientId: "$2"
+      help: "Kafka $1 JMX metric start time seconds"
+      type: GAUGE
+      valueFactor: 0.001
+    - pattern: 'kafka.(.+)<type=app-info, client-id=(.+)><>(commit-id|version): (.+)'
+      name: kafka_$1_$3_info
+      value: 1
+      labels:
+        clientId: "$2"
+        $3: "$4"
+      help: "Kafka $1 JMX metric info version and commit-id"
+      type: GAUGE
+
+    #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}",topic="{topic}"", partition="{partition}"
+    - pattern: kafka.consumer<type=consumer-fetch-manager-metrics, client-id=(.+), topic=(.+), partition=(.+)><>(.+-total|compression-rate|.+-avg|.+-replica|.+-lag|.+-lead)
+      name: kafka_consumer_fetch_manager_$4
+      labels:
+        clientId: "$1"
+        topic: "$2"
+        partition: "$3"
+      help: "Kafka Consumer JMX metric type consumer-fetch-manager-metrics"
+      type: GAUGE
+
+    #kafka.producer:type=producer-topic-metrics,client-id="{clientid}",topic="{topic}"
+    - pattern: kafka.producer<type=producer-topic-metrics, client-id=(.+), topic=(.+)><>(.+-total|compression-rate|.+-avg|.+rate)
+      name: kafka_producer_topic_$3
+      labels:
+        clientId: "$1"
+        topic: "$2"
+      help: "Kafka Producer JMX metric type producer-topic-metrics"
+      type: GAUGE
+
+    #kafka.connect:type=connect-node-metrics,client-id="{clientid}",node-id="{nodeid}"
+    #kafka.consumer:type=consumer-node-metrics,client-id=consumer-1,node-id="{nodeid}"
+    - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.+), node-id=(.+)><>(.+-total|.+-avg|.+-rate)
+      name: kafka_$2_$5
+      labels:
+        clientId: "$3"
+        nodeId: "$4"
+      help: "Kafka $1 JMX metric type $2"
+      type: GAUGE
+
+    #kafka.connect:type=kafka-metrics-count,client-id="{clientid}"
+    #kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{clientid}"
+    #kafka.consumer:type=consumer-coordinator-metrics,client-id="{clientid}"
+    #kafka.consumer:type=consumer-metrics,client-id="{clientid}"
+    - pattern: kafka.(.+)<type=(.+)-metrics, client-id=(.*)><>(.+-total|.+-avg|.+-bytes|.+-count|.+-ratio|.+-age|.+-flight|.+-threads|.+-connectors|.+-tasks|.+-ago)
+      name: kafka_$2_$4
+      labels:
+        clientId: "$3"
+      help: "Kafka $1 JMX metric type $2"
+      type: GAUGE
+
+    #kafka.connect:type=connector-metrics,connector="{connector}"
+    - pattern: 'kafka.connect<type=connector-metrics, connector=(.+)><>(connector-class|connector-type|connector-version|status): (.+)'
+      name: kafka_connect_connector_$2
+      value: 1
+      labels:
+        connector: "$1"
+        $2: "$3"
+      help: "Kafka Connect $2 JMX metric type connector"
+      type: GAUGE
+
+    #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}<> status"
+    - pattern: 'kafka.connect<type=connector-task-metrics, connector=(.+), task=(.+)><>status: ([a-z-]+)'
+      name: kafka_connect_connector_task_status
+      value: 1
+      labels:
+        connector: "$1"
+        task: "$2"
+        status: "$3"
+      help: "Kafka Connect JMX Connector task status"
+      type: GAUGE
+
+    #kafka.connect:type=task-error-metrics,connector="{connector}",task="{task}"
+    #kafka.connect:type=source-task-metrics,connector="{connector}",task="{task}"
+    #kafka.connect:type=sink-task-metrics,connector="{connector}",task="{task}"
+    #kafka.connect:type=connector-task-metrics,connector="{connector}",task="{task}"
+    - pattern: kafka.connect<type=(.+)-metrics, connector=(.+), task=(.+)><>(.+-total|.+-count|.+-ms|.+-ratio|.+-seq-no|.+-rate|.+-max|.+-avg|.+-failures|.+-requests|.+-timestamp|.+-logged|.+-errors|.+-retries|.+-skipped)
+      name: kafka_connect_$1_$4
+      labels:
+        connector: "$2"
+        task: "$3"
+      help: "Kafka Connect JMX metric type $1"
+      type: GAUGE
+
+    #kafka.connect:type=connect-worker-metrics,connector="{connector}"
+    - pattern: kafka.connect<type=connect-worker-metrics, connector=(.+)><>([a-z-]+)
+      name: kafka_connect_worker_$2
+      labels:
+        connector: "$1"
+      help: "Kafka Connect JMX metric $1"
+      type: GAUGE
+
+    #kafka.connect:type=connect-worker-metrics
+    - pattern: kafka.connect<type=connect-worker-metrics><>([a-z-]+)
+      name: kafka_connect_worker_$1
+      help: "Kafka Connect JMX metric worker"
+      type: GAUGE
+
+    #kafka.connect:type=connect-worker-rebalance-metrics,leader-name|connect-protocol
+    - pattern: 'kafka.connect<type=connect-worker-rebalance-metrics><>(leader-name|connect-protocol): (.+)'
+      name: kafka_connect_worker_rebalance_$1
+      value: 1
+      labels:
+          $1: "$2"
+      help: "Kafka Connect $2 JMX metric type worker rebalance"
+      type: UNTYPED
+
+    #kafka.connect:type=connect-worker-rebalance-metrics
+    - pattern: kafka.connect<type=connect-worker-rebalance-metrics><>([a-z-]+)
+      name: kafka_connect_worker_rebalance_$1
+      help: "Kafka Connect JMX metric rebalance information"
+      type: GAUGE
+
+    #kafka.connect:type=connect-coordinator-metrics
+    - pattern: kafka.connect<type=connect-coordinator-metrics><>(assigned-connectors|assigned-tasks)
+      name: kafka_connect_coordinator_$1
+      help: "Kafka Connect JMX metric assignment information"
+      type: GAUGE
+---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: my-connect-service
+#spec:
+#  ports:
+#  - name: http
+#    port: 8083
+#    targetPort: 8083
+#  selector:
+#    strimzi.io/cluster: my-connect
+#  type: NodePort

@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: akhq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: akhq
+  template:
+    metadata:
+      labels:
+        app: akhq
+    spec:
+      containers:
+        - name: akhq
+          image: tchiotludo/akhq
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: akhq-config-volume
+              mountPath: /app/application.yml
+              subPath: application.yaml    # Correct the subPath here
+      volumes:
+        - name: akhq-config-volume
+          configMap:
+            name: akhq-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: akhq-config
+  namespace: kafka
+data:
+  application.yaml: |
+    micronaut:
+      ssl:
+        port: 8080
+        #enabled: true
+        #buildSelfSigned: true
+      security:
+        enabled: true
+        groups:
+          admin:
+            roles:
+              - topic/read
+              - topic/insert
+              - topic/delete
+              - topic/config/update
+              - node/read
+              - node/config/update
+              - topic/data/read
+              - topic/data/insert
+              - topic/data/delete
+              - group/read
+              - group/delete
+              - group/offsets/update
+              - registry/read
+              - registry/insert
+              - registry/update
+              - registry/delete
+              - registry/version/delete
+              - acls/read
+              - connect/read
+              - connect/insert
+              - connect/update
+              - connect/delete
+              - connect/state/update
+            attributes:
+              topics-filter-regexp: "."
+        topic-reader:
+          roles:
+            - topic/read
+            - topic/config/update
+            - node/config/update
+            - node/read
+            - topic/data/read
+            - group/read
+            - group/offsets/update
+            - registry/read
+            - acls/read
+            - connect/read
+            - connect/state/update
+            - registry/update
+          attributes:
+            topics-filter-regexp: "test\\.reader.*"
+
+    akhq.security:
+      default-group: no-roles
+      basic-auth:
+        - username: admin
+          password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+          groups:
+            - admin
+        - username: reader
+          password: 6a589d18573e179cf745bc2eb982fbea2fb5da125cc394d1d92bcfb7ad597ba1
+          groups:
+            - reader
+      server:
+        cors:
+          enabled: true
+          configurations:
+            all:
+              allowedOrigins:
+                - http://localhost:3000
+    akhq:
+      connections:
+        IDC-cluster-sasl:
+          properties:
+            bootstrap.servers: "192.168.1.64:32208"
+            security.protocol: SASL_PLAINTEXT
+            sasl.mechanism: SCRAM-SHA-512
+            sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="OGCszB5Ff5CqVOTSQW5TCVXxRw9s7W8I";
+          connect:
+            - name: "connect1"
+              url: "http://192.168.1.83:30990"
